@@ -2,3 +2,17 @@
 /data
 *.csv
 *.zip
+
+# Python cashe
+__pycache__/
+
+# Virtual environment
+env/
+venv/
+.venv/
+
+#  VS Code settings
+.vscode/
+
+# Visualizations
+# visuals/
