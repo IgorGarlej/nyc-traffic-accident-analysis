@@ -1,4 +1,6 @@
 from rapidfuzz import process, fuzz
+from shapely.geometry import Point
+import pandas as pd
 
 # https://rapidfuzz.github.io/RapidFuzz/Usage/process.html
 
@@ -19,3 +21,14 @@ def find_similar_phrases(col, threshold=90):
             suggestions[phrase] = similar
         
     return suggestions
+
+
+# https://geopandas.org/en/stable/docs/user_guide/mergingdata.html#spatial-joins
+
+def create_geometry_column(df):
+    """
+    Creates a column with geometry.
+    """
+
+    df["GEOMETRY"] = df.apply(lambda row: Point(row["LONGITUDE"], row["LATITUDE"]), axis=1 )
+
