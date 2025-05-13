@@ -32,3 +32,24 @@ def create_geometry_column(df):
 
     df["GEOMETRY"] = df.apply(lambda row: Point(row["LONGITUDE"], row["LATITUDE"]), axis=1 )
 
+def normalize_street_names(street):
+    """
+    Normalizes common abbreviations of street.
+    """
+    street = street.replace(" ave", " avenue")
+    street = street.replace(" st, ", " street")
+    street = street.replace(" blvd, ", " boulevard")
+    street = street.replace(" rd", " road")
+    street = street.replace(" pkwy", " parkway")
+    street = street.replace(" expy", " expressway")
+    street = street.replace(" br", " bridge")
+    street = street.replace(" hwy", " highway")
+    street = street.replace(" hwy", " highway")
+    street = street.replace(" sr", "") # state route
+    street = street.replace(" s/r", "") # service route
+    street = street.replace(" e ", " east ")
+    street = street.replace(" w ", " west ")
+    street = street.replace(" n ", " north ")
+    street = street.replace(" s ", " south ")
+
+    return street
