@@ -26,14 +26,14 @@ def find_similar_phrases(col, threshold=90):
 
 # https://geopandas.org/en/stable/docs/user_guide/mergingdata.html#spatial-joins
 
-def create_geometry_column(df):
+def create_geometry_column(df: pd.DataFrame):
     """
     Creates a column with geometry.
     """
 
     df["GEOMETRY"] = df.apply(lambda row: Point(row["LONGITUDE"], row["LATITUDE"]), axis=1 )
 
-def normalize_street_names(street):
+def normalize_street_names(street: str) -> str:
     """
     Normalizes common abbreviations of street.
     """
@@ -55,92 +55,63 @@ def normalize_street_names(street):
 
     return street
 
+def reverse_dict_list(dict: dict) -> dict:
+    """
+    Creates a reverse dictionary.
+    """
 
-mapping = {
-        "bus": ["bu", "bs", "omnibus"],
-        "van": ["vang", "vn", "van t", "van (", "van/t", "refrigerated van", "van camper"],
-        "taxi": ["taxi"],
-        "bike": ["bicycle", "bicyc"],
-        "e-bike": ["ebike", "e bik", "e-bik", "e/bik", "e- bi", "e - b"],
-        "scooter": ["scoot", "scoo", "scooter", "motorscooter"],
-        "motorcycle": ["motor", "motorcycle", "motorbike"],
-        "suv": ["station wagon/sport utility vehicle", "sport utility / station wagon"],
-        "school bus": ["schoo"],
-        "e-scooter": ["e sco", "e-sco"],
-        "moped": ["mopd", "mopad"],
-        "garbage or refuse" : ["garbage or refuse"],
-        "tractor truck": ["tractor truck diesel", "tractor truck gasoline", "convertible", "semi", "semi-", "trail"],
-        "truck": ["trk", "tk", "tr", "ltr", "trl", "trlr", "trc", "track", "tract", "trac", "trac.", "tow truck / wrecker", "chassis cab", "cab", "cb"],
-        "pickup truck" : ["pickup-truck", "pick-up truck"],
-        "pickup": ["pick", "pick-", "picku", "pkup"],
-        "box truck": ["boxtr", "box t", "box"],
-        "lift boom truck": ["lift boom", "boom", "lift"],
-        "tanker": ["tanker", "tanke", "oil t", "fuel"],
-        "tank": ["tank"],
-        "flatbed": ["flat", "flatb", "flat/", "flat bed", "flat rack" , "stake or rack", "livestock rack", "glass rack"],
-        "dump truck": ["dump", "dumps", "dumpt"],
-        "delivery": ["deliv", "delv", "delvi", "del", "fedex"],
-        "ambulance": ["ambu", "amabu", "amb", "am", "mb", "ambul", "e amb"],
-        "fire truck": ["fire", "firet"],
-        "forklift": ["fork", "forkl", "fork-"],
-        "utility": ["util", "utili", "ulili", "ut"],
-        "limo": ["limou"],
-        "motor home": ["motorized home", "motor home"],
-        "rv": ["r/v"],
-        "tow truck": ["towtr", "tow-t", "tow t", "tow"],
-        "crane": ["crane"],
-        "sedan": ["2 dr sedan", "4 dr sedan", "4ds", "4dsd", "4d"],
-        "construction": ["const", "cont"],
-        "postal": ["usps", "usps2", "uspos", "posta", "posto", "mail"],
-        "federal": ["fdny", "fd ny", "feder"],
-        "nyc agency": ["nyc a", "nys a", "ns am", "nyc d", "nyc f", "nyc m", "nyc b"],
-        "special purpose": ["spc", "sp", "g spc", "spc p", "spec", "pc"],
-        "commercial": ["comme", "comm", "commm", "com", "com.", "comb", "co", "cm", "comer"],
-        "omnibus": ["omni", "omnib"],
-        "ladder": ["ladde", "loade"],
-        "chevy": ["chevy", "chevo", "heavy"],
-        "mark": ["mark", "marke"],
-        "skateboard": ["skate", "state"],
-        "horse": ["horse", "hrse"],
-        "suburban": ["subn", "subn/", "sub"],
-        "ems": ["ems a", "ems b"],
-        "caterpillar": ["cater", "cate", "cat.", "cat p" ],
-        "dot": ["dot t", "dot r"],
-        "winnebago": ["wineb", "winne"],
-        "trailer": ["trl", "trlr", "ltrl", "ltr"],
-        "unknown": ["unknown", "unkno", "unkow", "ukn", "unk", "none", "nan", "other", "moter"],
-        "enclosed body": ["enclosed body - nonremovable enclosure", "enclosed body - removable enclosure"],
-        "open body": ["open body"],
-        "passenger": ["passa", "passe"],
-        "uhaul": ["uhaul", "uhual", "u-hau"],
-        "special": ["psh", "p/sh"],
-        "apportioned": ["aport", "appor"],
-        "15 passenger": ["15 pa"],
-        "12 passenger": ["12 pa"],
-        "passenger vehicle" : ["passenger vehicle"],
-        "sea vehicle": ["sea", "se"],
-        "armored truck": ["armored truck", "armor"],
-        "police": ["polic", "nypd"],
-        "beverage truck" : ["beverage truck"],
-        "concrete mixer truck" : ["concrete mixer", "cement", "cemen", "(ceme", "concr"],
-        "livery vehicle": ["livery vehicle", "liver"]
-    }
+    reverse_dict = {}
+
+    for key, values in dict.items():
+        for val in values:
+            reverse_dict[val] = key
+    return reverse_dict
 
 
-def map_vehicle_type(df, cols, mapping):
+def map_vehicle_type(df: pd.DataFrame,
+        cols: list,
+        generalized: bool = False,
+        raw_mapping: dict = None,
+        generalized_mapping: dict = None
+) -> pd.DataFrame:
+    """
+    Cleans raw typos and categorizes vehicle types. 
+    Optionally generalizes vehicle types to broader category.
+    """
+    if raw_mapping is None:
+        raise ValueError("Raw mapping is required")
+    if generalized and generalized_mapping is None:
+        raise ValueError("Generalized mapping is required if 'generalized=True'.")
 
-    reverse_mapping = {}
+    reverse_raw_mapping = reverse_dict_list(raw_mapping)
 
-    for correct_type, incorrect_types in mapping.items():
-        for incorrect_type in incorrect_types:
-            reverse_mapping[incorrect_type] = correct_type
+    reverse_generalized_mapping = None
 
-    def replace_type(type_name):
-        return reverse_mapping.get(type_name, "unknown")
-    
-    df_corrected_types = df.copy()
+    if generalized:
+        reverse_generalized_mapping = reverse_dict_list(generalized_mapping)
+
+    def map_type(type_name):
+        mapped_type = reverse_raw_mapping.get(type_name, "unknown")
+
+        if generalized:
+            generalized_type = reverse_generalized_mapping.get(mapped_type, "unknown")
+            return generalized_type
+        
+        return mapped_type
+   
+    df_result = df.copy()
 
     for col in cols:
-        df_corrected_types[col] = df_corrected_types[col].map(replace_type)
 
-    return df_corrected_types
+        df_result[col] = df_result[col].map(map_type)
+
+    return df_result
+
+
+    
+
+    
+        
+
+    
+
