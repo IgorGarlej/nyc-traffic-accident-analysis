@@ -1,7 +1,7 @@
 from rapidfuzz import process, fuzz
 from shapely.geometry import Point
 import pandas as pd
-
+from matplotlib.ticker import FuncFormatter
 
 # https://rapidfuzz.github.io/RapidFuzz/Usage/process.html
 
@@ -76,7 +76,7 @@ def map_vehicle_type(df: pd.DataFrame,
 ) -> pd.DataFrame:
     """
     Cleans raw typos and categorizes vehicle types. 
-    Optionally generalizes vehicle types to broader category.
+    Optionally generalizes vehicle types into broader category.
     """
     if raw_mapping is None:
         raise ValueError("Raw mapping is required")
@@ -108,7 +108,12 @@ def map_vehicle_type(df: pd.DataFrame,
     return df_result
 
 
-    
+def apply_thousand_separator(ax):
+    """
+    Applies coma as a thousand separator.
+    """
+
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda x, _: f"{x:,.0f}"))
 
     
         
