@@ -1,8 +1,26 @@
+from json import load
+from pathlib import Path
 from rapidfuzz import process, fuzz
 from shapely.geometry import Point
 import pandas as pd
 from matplotlib.ticker import FuncFormatter
 
+
+def load_json(path: str) -> dict:
+    """Function responsible for reading JSON files"""
+    with open(path, "r") as file:
+        json_data = load(file)
+        return json_data
+    
+
+def load_mapping(file_name: str) -> dict:
+    """Function responsible for loading json mappings from other mappings directory"""
+    path = Path(__file__).parent / "mappings" / file_name
+    with open(path, "r") as file:
+        json_data = load(file)
+        return json_data
+    
+    
 # https://rapidfuzz.github.io/RapidFuzz/Usage/process.html
 
 def find_similar_phrases(col, threshold=90):
@@ -32,6 +50,57 @@ def create_geometry_column(df: pd.DataFrame):
     """
 
     df["GEOMETRY"] = df.apply(lambda row: Point(row["LONGITUDE"], row["LATITUDE"]), axis=1 )
+
+
+class StreetNormalizer:
+    """
+    A class responsible for normalizing street names using predefined abbreviation mappings.
+    """
+
+    def __init__(self, mapping_file: str ="street_abbreviations.json"):
+        """
+        Initializes street normalizer by load mapping from a JSON file
+        """
+        
+        self.abbreviations = self._load_mapping(mapping_file)
+    
+    def _load_mapping(self, file_name: str) -> dict:
+        """
+        Loads the mapping from the mapping directory.
+        """
+
+        path = Path(__file__).parent / "mappings" / file_name
+        with open(path, "r") as file:
+            json_data = load(file).get("street_abbreviations", {})
+            return json_data
+        
+    def normalize_string(self, street_name: str) -> str:
+        """
+        Normalizes a single string
+        """
+
+        for abbrev, full_name in self.abbreviations.items():
+            street_name = street_name.replace(abbrev, full_name)
+        return street_name
+    
+    def normalize_series(self, series: pd.Series) -> pd.Series:
+        """
+        Normalizes all street in the Pandas Series
+        """
+
+        return series.apply(self.normalize_string)
+    
+    def normalize_df_cols(self,df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
+        """
+        Normalizes multiple columns
+        """
+        df = df.copy()
+        for col in columns:
+            df[col] = self.normalize_series(df[col])
+        return df
+    
+
+
 
 def normalize_street_names(street: str) -> str:
     """
@@ -116,7 +185,19 @@ def apply_thousand_separator(ax):
     ax.yaxis.set_major_formatter(FuncFormatter(lambda x, _: f"{x:,.0f}"))
 
     
-        
+
+if __name__ == "__main__":
+
+    data = {
+        'street_address': ['123 Main st', '456 Oak ave', '789 First blvd'],
+        'mailing_address': ['111 Park dr', '222 Second st', '333 Third ave']
+    }
+
+    df = pd.DataFrame(data)
+    normalizer = StreetNormalizer()
+    result = normalizer.normalize_df_cols(df, ["street_address", "mailing_address"])
+    print(result)
+    
 
     
 

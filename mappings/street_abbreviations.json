@@ -1,0 +1,18 @@
+{
+    "street_abbreviations":{
+            " ave": " avenue",
+            " st": " street",
+            " blvd": " boulevard",
+            " rd": " road",
+            " pkwy": " parkway",
+            " expy": " expressway",
+            " br": " bridge",
+            " hwy": " highway",
+            " sr": "",
+            " s/r": "",
+            " e ": " east ",
+            " w ": " west ",
+            " n ": " north ",
+            " s ": " south "
+    }
+}

@@ -1,0 +1,36 @@
+{
+    "nypd-motor-vehicle-collisions":{
+    "cols_dtypes":{
+        "ACCIDENT DATE": "datetime64[ns]",
+        "ACCIDENT TIME": "datetime64[ns]",
+        "BOROUGH": "string",
+        "ZIP CODE": "string",
+        "LATITUDE": "float32",
+        "LONGITUDE": "float32",
+        "LOCATION": "object",
+        "ON STREET NAME": "string",
+        "CROSS STREET NAME": "string",
+        "OFF STREET NAME": "string",
+        "NUMBER OF PERSONS INJURED": "Int16",
+        "NUMBER OF PERSONS KILLED": "Int16",
+        "NUMBER OF PEDESTRIANS INJURED": "Int16",
+        "NUMBER OF PEDESTRIANS KILLED": "Int16",
+        "NUMBER OF CYCLIST INJURED": "Int16",
+        "NUMBER OF CYCLIST KILLED": "Int16",
+        "NUMBER OF MOTORIST INJURED": "Int16",
+        "NUMBER OF MOTORIST KILLED": "Int16",
+        "CONTRIBUTING FACTOR VEHICLE 1": "string",
+        "CONTRIBUTING FACTOR VEHICLE 2": "string",
+        "CONTRIBUTING FACTOR VEHICLE 3": "string",
+        "CONTRIBUTING FACTOR VEHICLE 4": "string",
+        "CONTRIBUTING FACTOR VEHICLE 5": "string",
+        "COLLISION_ID": "string",
+        "VEHICLE TYPE CODE 1": "string",
+        "VEHICLE TYPE CODE 2": "string",
+        "VEHICLE TYPE CODE 3": "string",
+        "VEHICLE TYPE CODE 4": "string",
+        "VEHICLE TYPE CODE 5": "string"
+        },
+        "cols_to_read": [3,5,6,7,8,9,10,11,18,19,20,21,22,23,24,25,26,27,28,29]
+    }
+}
