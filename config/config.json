@@ -1,8 +1,8 @@
 {
     "nypd-motor-vehicle-collisions":{
     "cols_dtypes":{
-        "ACCIDENT DATE": "datetime64[ns]",
-        "ACCIDENT TIME": "datetime64[ns]",
+        "ACCIDENT DATE": "object",
+        "ACCIDENT TIME": "object",
         "BOROUGH": "string",
         "ZIP CODE": "string",
         "LATITUDE": "float32",
@@ -31,6 +31,26 @@
         "VEHICLE TYPE CODE 4": "string",
         "VEHICLE TYPE CODE 5": "string"
         },
-        "cols_to_read": [3,5,6,7,8,9,10,11,18,19,20,21,22,23,24,25,26,27,28,29]
+        "cols_to_read": [
+            "BOROUGH",
+            "LATITUDE",
+            "LONGITUDE",
+            "ON STREET NAME",
+            "CROSS STREET NAME",
+            "OFF STREET NAME",
+            "NUMBER OF PERSONS INJURED",
+            "NUMBER OF PERSONS KILLED",
+            "CONTRIBUTING FACTOR VEHICLE 1",
+            "CONTRIBUTING FACTOR VEHICLE 2",
+            "CONTRIBUTING FACTOR VEHICLE 3",
+            "CONTRIBUTING FACTOR VEHICLE 4",
+            "CONTRIBUTING FACTOR VEHICLE 5",
+            "COLLISION_ID",
+            "VEHICLE TYPE CODE 1",
+            "VEHICLE TYPE CODE 2",
+            "VEHICLE TYPE CODE 3",
+            "VEHICLE TYPE CODE 4",
+            "VEHICLE TYPE CODE 5"
+        ]
     }
 }
